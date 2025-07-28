@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Welcome to BuyMI</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #c2e9fb, #e0c3fc);
+      animation: gradientBG 10s ease infinite;
+      background-size: 400% 400%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      text-align: center;
+    }
+
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    h1 {
+      font-size: 48px;
+      color: #2d6a8d;
+      margin-bottom: 10px;
+      text-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+    }
+
+    .explore-btn {
+      background: #2d6a8d;
+      color: white;
+      padding: 14px 28px;
+      font-size: 18px;
+      border: none;
+      border-radius: 10px;
+      margin-top: 25px;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.3s;
+    }
+
+    .explore-btn:hover {
+      background: #1f5370;
+      transform: scale(1.05);
+    }
+
+    h2 {
+      margin-top: 40px;
+      font-size: 28px;
+      color: #444;
+    }
+
+    .features {
+      margin-top: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 15px;
+      max-width: 700px;
+    }
+
+    .feature-btn {
+      padding: 12px 20px;
+      font-size: 16px;
+      background-color: white;
+      border: 2px solid #2d6a8d;
+      color: #2d6a8d;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .feature-btn:hover {
+      background-color: #2d6a8d;
+      color: white;
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Welcome to BuyMI</h1>
+  <button class="explore-btn" id="startExplore">🚀 Start Exploring</button>
+
+  <h2>Why you Love BuyMI</h2>
+  <div class="features">
+    <button class="feature-btn">🛍️ Smart Price Comparison</button>
+    <button class="feature-btn">💖 Wishlist & Cart Features</button>
+    <button class="feature-btn">🤖 AI Stylist Support</button>
+    <button class="feature-btn">📊 Visual Graphs & Insights</button>
+    <button class="feature-btn">🚀 Smooth Shopping Experience</button>
+  </div>
+
+  <script>
+    document.getElementById("startExplore").addEventListener("click", function() {
+      window.location.href = "home.html"; // ✅ This ensures correct page redirection
+    });
+  </script>
+
+</body>
+</html>

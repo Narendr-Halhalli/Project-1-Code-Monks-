@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>🧞 StyleGenie Assistant</title>
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Quicksand', sans-serif;
+      background: linear-gradient(to right, #fef3f9, #f3e7ff);
+      color: #333;
+      overflow-x: hidden;
+    }
+
+    h1 {
+      font-family: 'Pacifico', cursive;
+      text-align: center;
+      color: #8a2be2;
+      font-size: 2.8rem;
+      margin: 2rem 1rem 1rem;
+    }
+
+    .section {
+      display: none;
+      max-width: 850px;
+      margin: 2rem auto;
+      background: white;
+      padding: 2rem;
+      border-radius: 1.5rem;
+      box-shadow: 0 0 30px rgba(0,0,0,0.1);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .option-card {
+      background: #f5f0ff;
+      border: 2px solid transparent;
+      border-radius: 1rem;
+      padding: 1rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .option-card:hover,
+    .option-card.active {
+      border-color: #8a2be2;
+      background: #ede1ff;
+    }
+
+    .btn {
+      margin-top: 2rem;
+      padding: 0.8rem 2.5rem;
+      background: linear-gradient(to right, #8a2be2, #c27fff);
+      color: white;
+      border: none;
+      border-radius: 2rem;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+
+    .outfit-img {
+      width: 70%;
+      max-width: 300px;
+      margin-top: 1rem;
+      border-radius: 1rem;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    }
+
+    #assistant-orb {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 60px;
+      height: 60px;
+      background: radial-gradient(circle at top left, #a64bf4, #8a2be2);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+      cursor: pointer;
+      z-index: 999;
+      box-shadow: 0 0 15px rgba(138,43,226,0.5);
+    }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(138,43,226,0.4); }
+      70% { box-shadow: 0 0 0 20px rgba(138,43,226,0); }
+      100% { box-shadow: 0 0 0 0 rgba(138,43,226,0); }
+    }
+
+    #chat-box {
+      display: none;
+      position: fixed;
+      bottom: 90px;
+      right: 20px;
+      width: 300px;
+      background: white;
+      border: 2px solid #8a2be2;
+      border-radius: 1rem;
+      box-shadow: 0 0 20px rgba(0,0,0,0.2);
+      z-index: 998;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      height: 380px;
+    }
+
+    #chat-header {
+      background: #8a2be2;
+      color: white;
+      padding: 10px;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    #chat-messages {
+      flex: 1;
+      padding: 10px;
+      overflow-y: auto;
+      font-size: 14px;
+    }
+
+    .message {
+      margin: 6px 0;
+      line-height: 1.4;
+    }
+
+    .user-msg {
+      text-align: right;
+      color: #8a2be2;
+    }
+
+    .bot-msg {
+      text-align: left;
+      color: #444;
+    }
+
+    #chat-input {
+      display: flex;
+      border-top: 1px solid #ccc;
+    }
+
+    #chat-input input {
+      flex: 1;
+      border: none;
+      padding: 10px;
+      font-size: 14px;
+      outline: none;
+    }
+
+    #chat-input button {
+      background: #8a2be2;
+      color: white;
+      border: none;
+      padding: 0 16px;
+      cursor: pointer;
+    }
+
+    #welcome-msg {
+      position: fixed;
+      bottom: 90px;
+      right: 100px;
+      background: white;
+      border: 2px solid #8a2be2;
+      border-radius: 1rem;
+      padding: 1rem;
+      font-weight: bold;
+      box-shadow: 0 0 20px rgba(0,0,0,0.2);
+      z-index: 998;
+    }
+  </style>
+</head>
+<body>
+  <h1>🧞 Welcome to StyleGenie</h1>
+
+  <!-- Step 1: Body & Skin -->
+  <div id="bodySection" class="section">
+    <h2>🔍 Analyze Body & Skin</h2>
+    <label>Body Type:</label>
+    <select id="bodyType">
+      <option value="">--Select--</option>
+      <option>Hourglass</option>
+      <option>Pear</option>
+      <option>Apple</option>
+      <option>Rectangle</option>
+    </select>
+    <br><br>
+    <label>Skin Tone:</label>
+    <select id="skinTone">
+      <option value="">--Select--</option>
+      <option>Fair</option>
+      <option>Medium</option>
+      <option>Olive</option>
+      <option>Dark</option>
+    </select>
+    <br><br>
+    <button class="btn" onclick="goToQuiz()">Next ➡️</button>
+  </div>
+
+  <!-- Step 2: Quiz -->
+  <div id="quizSection" class="section">
+    <h2>🧠 Style Quiz</h2>
+    <label>Style Preference</label>
+    <div class="grid" id="style-options">
+      <div class="option-card" onclick="selectOption('style','Casual')">Casual</div>
+      <div class="option-card" onclick="selectOption('style','Chic')">Chic</div>
+      <div class="option-card" onclick="selectOption('style','Elegant')">Elegant</div>
+    </div>
+    <label>Color Palette</label>
+    <div class="grid" id="color-options">
+      <div class="option-card" onclick="selectOption('color','Neutral')">Neutral</div>
+      <div class="option-card" onclick="selectOption('color','Bold')">Bold</div>
+      <div class="option-card" onclick="selectOption('color','Pastel')">Pastel</div>
+    </div>
+    <label>Occasion</label>
+    <div class="grid" id="occasion-options">
+      <div class="option-card" onclick="selectOption('occasion','Daily')">Daily</div>
+      <div class="option-card" onclick="selectOption('occasion','Party')">Party</div>
+      <div class="option-card" onclick="selectOption('occasion','Work')">Work</div>
+    </div>
+    <button class="btn" onclick="submitQuiz()">Show Outfit ✨</button>
+  </div>
+
+  <!-- Step 3: Result -->
+  <div id="resultSection" class="section">
+    <h2>👗 Your Style Profile</h2>
+    <p><strong>Body Type:</strong> <span id="viewBody"></span></p>
+    <p><strong>Skin Tone:</strong> <span id="viewSkin"></span></p>
+    <p><strong>Style:</strong> <span id="viewStyle"></span></p>
+    <p><strong>Color:</strong> <span id="viewColor"></span></p>
+    <p><strong>Occasion:</strong> <span id="viewOccasion"></span></p>
+    <h3 id="styleName"></h3>
+    <img id="styleImage" class="outfit-img" src="" alt="Outfit">
+  </div>
+
+  <!-- Assistant Orb -->
+  <div id="assistant-orb" onclick="toggleChat()"></div>
+
+  <!-- Chat Box -->
+  <div id="chat-box">
+    <div id="chat-header">StyleGenie 💬</div>
+    <div id="chat-messages">
+      <div class="message bot-msg">Hi there! Ask me about outfits for any occasion! 💫</div>
+    </div>
+    <div id="chat-input">
+      <input type="text" id="user-input" placeholder="Ask me something..." />
+      <button onclick="sendMessage()">Send</button>
+    </div>
+  </div>
+
+  <div id="welcome-msg">Hello <span id="welcomeUser">User</span>! 💫</div>
+
+  <script>
+    const userName = localStorage.getItem("userName") || "User";
+    document.getElementById("welcomeUser").innerText = userName;
+
+    let quizData = { style: "", color: "", occasion: "" };
+    let bodyType = "", skinTone = "";
+
+    window.onload = () => {
+      document.getElementById("bodySection").style.display = "block";
+      document.getElementById("welcome-msg").style.display = "block";
+      setTimeout(() => document.getElementById("welcome-msg").style.display = "none", 4000);
+    };
+
+    function toggleChat() {
+      const box = document.getElementById("chat-box");
+      box.style.display = box.style.display === "flex" ? "none" : "flex";
+    }
+
+    function sendMessage() {
+  const input = document.getElementById("user-input");
+  const msg = input.value.trim();
+  if (!msg) return;
+
+  const chat = document.getElementById("chat-messages");
+
+  const userDiv = document.createElement("div");
+  userDiv.className = "message user-msg";
+  userDiv.textContent = msg;
+  chat.appendChild(userDiv);
+
+  const botDiv = document.createElement("div");
+  botDiv.className = "message bot-msg";
+
+  if (msg.toLowerCase().includes("party")) {
+    botDiv.innerHTML = `🎉 Try this outfit: <strong>Fierce Chic Party Dress</strong><br>
+      <img src="https://i.pinimg.com/736x/98/73/88/987388a265cc940aa4603214ba7fe83f.jpg" 
+           alt="Party Outfit" style="width:100%;margin-top:8px;border-radius:12px;">`;
+  } else if (msg.toLowerCase().includes("casual")) {
+    botDiv.innerHTML = `👕 How about this: <strong>Pastel Hoodie + Jeans</strong><br>
+      <img src="https://i.pinimg.com/1200x/9a/69/96/9a69965dba8108c4ca5bcea1fe741bc1.jpg" 
+           alt="Casual Outfit" style="width:100%;margin-top:8px;border-radius:12px;">`;
+  } else if (msg.toLowerCase().includes("traditional")) {
+    botDiv.innerHTML = `👑 This might suit you: <strong>Floral Pastel Gown</strong><br>
+      <img src="https://i.pinimg.com/736x/e1/97/5a/e1975a9ffda6b8294fca1a0bfb1c45a3.jpg" 
+           alt="Traditional Outfit" style="width:100%;margin-top:8px;border-radius:12px;">`;
+  } else {
+    botDiv.textContent = "Let me think... maybe try our quiz for personal outfit suggestions!";
+  }
+
+  setTimeout(() => {
+    chat.appendChild(botDiv);
+    chat.scrollTop = chat.scrollHeight;
+  }, 400);
+
+  input.value = "";
+}
+
+
+    function goToQuiz() {
+      bodyType = document.getElementById("bodyType").value;
+      skinTone = document.getElementById("skinTone").value;
+      if (!bodyType || !skinTone) return alert("Please select both body type and skin tone!");
+      document.getElementById("bodySection").style.display = "none";
+      document.getElementById("quizSection").style.display = "block";
+    }
+
+    function selectOption(type, value) {
+      quizData[type] = value;
+      document.querySelectorAll(`#${type}-options .option-card`).forEach(card => card.classList.remove('active'));
+      Array.from(document.querySelectorAll(`#${type}-options .option-card`)).find(card => card.textContent === value)?.classList.add('active');
+    }
+
+    function submitQuiz() {
+      const { style, color, occasion } = quizData;
+      if (!style || !color || !occasion) return alert("Please complete all quiz sections!");
+
+      const key = `${style}-${color}-${occasion}`;
+      const outfits = {
+        "Casual-Neutral-Daily": {
+          name: "Soft Neutral Tee + Jeans",
+          img: "https://i.pinimg.com/736x/33/92/c7/3392c7bed047f9db9b4a0ca0c100fc5e.jpg"
+        },
+        "Casual-Neutral-Party": {
+          name: "Relaxed White Shirt + Black Pants",
+          img: "https://i.pinimg.com/736x/d9/93/ae/d993aea61f203b1699f81e4171b2427e.jpg"
+        },
+        "Casual-Neutral-Work": {
+          name: "Blazer + Basic Tee + Jeans",
+          img: "https://i.pinimg.com/736x/59/da/d5/59dad5c089b0f75ef1e15fbd6232ca64.jpg"
+        },
+        "Casual-Bold-Daily": {
+          name: "Printed Crop Top + Cargo Pants",
+          img: "https://i.pinimg.com/736x/47/68/67/476867f1fb9a0a12d9fd235a6137561a.jpg"
+        },
+        "Casual-Bold-Party": {
+          name: "Graphic Tee + Leather Skirt",
+          img: "https://i.pinimg.com/1200x/25/26/6f/25266f757f6e138a2631bc8adb90fd0b.jpg"
+        },
+        "Casual-Bold-Work": {
+          name: "Vibrant Blazer + Neutral Slacks",
+          img: "https://i.pinimg.com/736x/47/4e/e9/474ee9fc1107f85088224c84583a3185.jpg"
+        },
+        "Casual-Pastel-Daily": {
+          name: "Pastel Hoodie + Jeans",
+          img: "https://i.pinimg.com/1200x/9a/69/96/9a69965dba8108c4ca5bcea1fe741bc1.jpg"
+        },
+        "Casual-Pastel-Party": {
+          name: "Pastel Crop Sweater + Skirt",
+          img: "https://i.pinimg.com/736x/1a/e1/de/1ae1dea244ca61e7c9309472adc2e70e.jpg"
+        },
+        "Casual-Pastel-Work": {
+          name: "Soft Blush Shirt + Trousers",
+          img: "https://i.pinimg.com/736x/8b/06/02/8b06026deba35c1e9c437d9807acbbb8.jpg"
+        },
+        "Chic-Neutral-Daily": {
+          name: "Beige Trench + Skinny Jeans",
+          img: "https://i.pinimg.com/736x/80/83/99/808399e75cfab537dc9e87324ed73349.jpg"
+        },
+        "Chic-Neutral-Party": {
+          name: "White Blazer Dress",
+          img: "https://i.pinimg.com/736x/a1/fa/f6/a1faf64f280d8580b70312a9d1a8f9da.jpg"
+        },
+        "Chic-Neutral-Work": {
+          name: "Structured Cream Suit",
+          img: "https://i.pinimg.com/736x/b0/9c/88/b09c888fa4a794105a058439a61c266a.jpg"
+        },
+        "Chic-Bold-Daily": {
+          name: "Bold Patterned Blouse + Jeans",
+          img: "https://i.pinimg.com/1200x/c0/8e/6e/c08e6ef979e0106984d1b5f8f908891c.jpg"
+        },
+        "Chic-Bold-Party": {
+          name: "Fierce Chic Party Dress",
+          img: "https://i.pinimg.com/736x/98/73/88/987388a265cc940aa4603214ba7fe83f.jpg"
+        },
+        "Chic-Bold-Work": {
+          name: "Bright Red Suit + White Top",
+          img: "https://i.pinimg.com/736x/e4/02/e4/e402e410523625bf3b7418815382293b.jpg"
+        },
+        "Chic-Pastel-Daily": {
+          name: "Lavender Knit Top + White Jeans",
+          img: "https://i.pinimg.com/736x/b2/6b/01/b26b01956d5d6b7950ce5ae49e7138f3.jpg"
+        },
+        "Chic-Pastel-Party": {
+          name: "Pastel Slip Dress + Accessories",
+          img: "https://i.pinimg.com/736x/1d/a5/ca/1da5ca4d46f6e39499bb0e50c06f6513.jpg"
+        },
+        "Chic-Pastel-Work": {
+          name: "Blush Blazer + White Blouse",
+          img: "https://i.pinimg.com/736x/1f/8c/be/1f8cbe39084747cd57fc45975ce016a9.jpg"
+        },
+        "Elegant-Neutral-Daily": {
+          name: "Camel Coat + Knit Dress",
+          img: "https://i.pinimg.com/1200x/3b/e0/ad/3be0ad5eca10295bc6967f22ce9ccaf4.jpg"
+        },
+        "Elegant-Neutral-Party": {
+          name: "Silk Beige Gown + Jewelry",
+          img: "https://i.pinimg.com/736x/20/3b/cd/203bcd0d79ad8c20ecbb27cdbdc87dca.jpg"
+        },
+        "Elegant-Neutral-Work": {
+          name: "Classic Black Dress + Blazer",
+          img: "https://i.pinimg.com/736x/6b/2d/da/6b2dda94101d32760c6e810dcb7948d1.jpg"
+        },
+        "Elegant-Bold-Daily": {
+          name: "Sleek Red Midi Dress",
+          img: "https://i.pinimg.com/1200x/45/0c/ec/450cec89351d2ba110ef7b8a421e6665.jpg"
+        },
+        "Elegant-Bold-Party": {
+          name: "Statement Gown + Gold Heels",
+          img: "https://i.pinimg.com/736x/29/d1/49/29d149c76811c408f8bba821a3cc45f2.jpg"
+        },
+        "Elegant-Bold-Work": {
+          name: "Royal Blue Dress + Belt",
+          img: "https://i.pinimg.com/736x/65/09/cd/6509cd7ce2fa3e4cb06b9f1af7553c5d.jpg"
+        },
+        "Elegant-Pastel-Daily": {
+          name: "Pastel Wrap Dress",
+          img: "https://i.pinimg.com/736x/55/cc/a6/55cca6bef79c15d56d68b15984bff3f7.jpg"
+        },
+        "Elegant-Pastel-Party": {
+          name: "Floral Pastel Gown",
+          img: "https://i.pinimg.com/736x/e1/97/5a/e1975a9ffda6b8294fca1a0bfb1c45a3.jpg"
+        },
+        "Elegant-Pastel-Work": {
+          name: "Graceful Office Elegance",
+          img: "https://i.pinimg.com/736x/69/04/7f/69047fabea7b8e7bbea296e1c033da5a.jpg"
+        }
+      };
+
+
+      const result = outfits[key] || {
+        name: `${color} ${style} Outfit for ${occasion}`,
+        img: "https://images.unsplash.com/photo-1542062703-174cdaaedc6a"
+      };
+
+      document.getElementById("quizSection").style.display = "none";
+      document.getElementById("resultSection").style.display = "block";
+
+      document.getElementById("viewBody").textContent = bodyType;
+      document.getElementById("viewSkin").textContent = skinTone;
+      document.getElementById("viewStyle").textContent = style;
+      document.getElementById("viewColor").textContent = color;
+      document.getElementById("viewOccasion").textContent = occasion;
+      document.getElementById("styleName").textContent = "✨ " + result.name;
+      document.getElementById("styleImage").src = result.img + "?w=400";
+    }
+  </script>
+</body>
+</html>
