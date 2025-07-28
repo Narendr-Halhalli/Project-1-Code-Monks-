@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>🛒BuyMI</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background: linear-gradient(135deg, #c4e0f6, #b7dcfa);
+    }
+
+    header {
+      height: 250px;
+      background-size: cover;
+      background-position: center;
+      color: white;
+      text-align: center;
+      padding-top: 60px;
+      transition: background-image 1s ease-in-out;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+    }
+
+    header h1 {
+      font-size: 40px;
+      margin: 0;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
+    }
+
+    nav {
+      margin-top: 15px;
+    }
+
+    nav a {
+      margin: 0 15px;
+      color: rgb(221, 199, 181);
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 18px;
+    }
+
+    #main-layout {
+      display: flex;
+      max-width: 1200px;
+      margin: 30px auto;
+      background: #e8e6e5;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    }
+
+    #sidebar {
+      width: 260px;
+      background: #cae3df;
+      padding: 20px;
+    }
+
+    #sidebar li {
+      list-style: none;
+      margin: 8px 0;
+      padding: 12px;
+      background: #aabacd;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    #sidebar li:hover {
+      background: #d0d8e1;
+    }
+
+    #main-content {
+      flex: 1;
+      padding: 20px;
+    }
+
+    .product-block {
+      background: #fff;
+      padding: 15px;
+      margin-bottom: 25px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .product-img {
+      width: 120px;
+      height: 120px;
+      object-fit: cover;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 10px 0;
+    }
+
+    .compare-table th,
+    .compare-table td {
+      padding: 8px;
+      border: 1px solid #ddd;
+      text-align: center;
+    }
+
+    .compare-table th {
+      background: #ecf0f1;
+    }
+
+    .best-price td {
+      background: #27ae60;
+      color: white;
+      font-weight: bold;
+    }
+
+    .mini-chart {
+      width: 120px !important;
+      height: 120px !important;
+      margin-top: 10px;
+      display: none;
+    }
+
+    .toggle-btn {
+      background-color: #2075ad;
+      color: white;
+      border: none;
+      padding: 6px 10px;
+      font-size: 13px;
+      margin-top: 5px;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+
+    .toggle-btn:hover {
+      background-color: #256fa0;
+    }
+
+    /* Contact Footer */
+    footer#contact {
+      padding: 30px;
+      background-color: #2075ad;
+      color: white;
+      text-align: center;
+      margin-top: 50px;
+    }
+
+    footer#contact h2 {
+      margin-bottom: 10px;
+    }
+
+    /* Chatbot styles */
+    #chatbot-icon {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color:#930d49;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      font-size: 24px;
+      cursor: pointer;
+      z-index: 1000;
+      padding: 0;
+      overflow: visible;
+    }
+
+    #chatbot-container {
+      position: fixed;
+      bottom: 80px;
+      right: 20px;
+      width: 300px;
+      background-color: white;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      display: none;
+      z-index: 999;
+      overflow: hidden;
+      flex-direction: column;
+      font-size: 14px;
+    }
+
+    #chatbot-header {
+      background-color: #2075ad;
+      color: white;
+      padding: 10px;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    #chatbot-body {
+      padding: 10px;
+      max-height: 200px;
+      overflow-y: auto;
+      font-size: 14px;
+      min-height: 80px;
+    }
+
+    #chatbot-input {
+      display: flex;
+      border-top: 1px solid #ccc;
+    }
+
+    #chatbot-input input {
+      flex: 1;
+      padding: 8px;
+      border: none;
+      outline: none;
+      font-size: 14px;
+    }
+
+    #chatbot-input button {
+      background-color: #2075ad;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    #chatbot-input button:hover {
+      background-color: #6593c8;
+    }
+  </style>
+</head>
+<body>
+
+<header id="dynamic-header">
+  <h1>BuyMI</h1>
+  <nav>
+    <a href="#">🏠 Home</a>
+    <a href="#contact">📞 Contact</a>
+  </nav>
+</header>
+
+<div id="main-layout">
+  <aside id="sidebar">
+    <h3>Categories</h3>
+    <ul id="category-list"></ul>
+  </aside>
+  <main id="main-content">
+    <h2 id="category-title">Select a Category</h2>
+    <div id="product-area"></div>
+  </main>
+</div>
+
+<!-- 📞 Contact Section -->
+<footer id="contact">
+  <h2>Contact Us</h2>
+  <p>Email: support@buymi.com</p>
+  <p>Phone: +91-9876543210</p>
+  <p>Address: 123 Market Street, Bangalore, India</p>
+</footer>
+
+<!-- Chatbot Icon -->
+<button id="chatbot-icon" aria-label="Open Chatbot">💬</button>
+
+<!-- Chatbot Container -->
+<div id="chatbot-container" role="dialog" aria-modal="true" aria-labelledby="chatbot-header">
+  <div id="chatbot-header">AI Fashion Assistant 🤖</div>
+  <div id="chatbot-body">Hi! Tell me about your skin color, fashion style, or needs and I'll suggest products! 😊</div>
+  <div id="chatbot-input">
+    <input type="text" placeholder="Type your message..." aria-label="Chatbot input" />
+    <button aria-label="Send message">Send</button>
+  </div>
+</div>
+
+<script>
+  // Header image rotator
+  const headerImages = [
+    "https://i.pinimg.com/1200x/4d/12/4f/4d124f08d0b68e52c3d2344f4f136797.jpg",
+    "https://i.pinimg.com/1200x/da/5e/fd/da5efd812b05bb38e9a75266c5a17cae.jpg",
+    "https://i.pinimg.com/1200x/4b/c5/a8/4bc5a864bc7cb0cffbee7b40e28f7c02.jpg"
+  ];
+  let currentHeader = 0;
+  const headerEl = document.getElementById('dynamic-header');
+
+  function rotateHeader() {
+    headerEl.style.backgroundImage = `url(${headerImages[currentHeader]})`;
+    currentHeader = (currentHeader + 1) % headerImages.length;
+  }
+
+  rotateHeader();
+  setInterval(rotateHeader, 5000);
+
+  const comparisonData = {
+    "Electronics": [
+      { name: "Samsung Galaxy S21 📱", image: "https://i.pinimg.com/736x/02/55/bf/0255bfe6cf3a0d8040b872e4f69284d3.jpg", platforms: { Amazon: 15699, Flipkart: 15899, Myntra: 16500, Ajio: 16799 } },
+      { name: "Dell XPS 13 💻", image: "https://i.pinimg.com/736x/0e/43/77/0e43776979a8eeff3ecd14706b959d9d.jpg", platforms: { Amazon: 89999, Flipkart: 87999, Myntra: 90500, Ajio: 88999 } }
+    ],
+    "Clothing": [
+      { name: "T-Shirt 👕", image: "https://i.pinimg.com/1200x/76/34/b5/7634b5919aeb8522a9a47dd725bba39f.jpg", platforms: { Amazon: 499, Flipkart: 489, Myntra: 450, Ajio: 459 } },
+      { name: "Jeans 👖", image: "https://i.pinimg.com/1200x/b8/50/cb/b850cbc30bdefefc150033561460c1b6.jpg", platforms: { Amazon: 1299, Flipkart: 1249, Myntra: 1199, Ajio: 1210 } }
+    ],
+    "Books": [
+      { name: "The Alchemist 📘", image: "https://i.pinimg.com/736x/e7/8c/a9/e78ca907a9fc1f15d37e0451cb90e55c.jpg", platforms: { Amazon: 299, Flipkart: 289, Myntra: 310, Ajio: 279 } },
+      { name: "Atomic Habits 📗", image: "https://i.pinimg.com/1200x/39/d9/d6/39d9d620d911c59cddd87302a2810bc3.jpg", platforms: { Amazon: 499, Flipkart: 479, Myntra: 510, Ajio: 469 } }
+    ],
+    "Kitchen": [
+      { name: "Blender 🧃", image: "https://i.pinimg.com/1200x/d4/01/cd/d401cd7470c12f1e044e10f32f64f221.jpg", platforms: { Amazon: 4999, Flipkart: 4799, Myntra: 5100, Ajio: 4599 } },
+      { name: "Air Fryer 🍟", image: "https://i.pinimg.com/736x/a4/be/06/a4be065d94c2f96306b30c841a6ccba4.jpg", platforms: { Amazon: 6999, Flipkart: 6799, Myntra: 7200, Ajio: 6599 } }
+    ],
+    "Furniture": [
+      { name: "Office Chair 🪑", image: "", platforms: { Amazon: 3499, Flipkart: 3399, Myntra: 3600, Ajio: 3299 } },
+      { name: "Dining Table 🍽️", image: "", platforms: { Amazon: 8999, Flipkart: 8799, Myntra: 9200, Ajio: 8599 } }
+    ]
+  };
+
+  const categories = Object.keys(comparisonData);
+
+  const categoryListEl = document.getElementById('category-list');
+  const productArea = document.getElementById('product-area');
+  const categoryTitle = document.getElementById('category-title');
+
+  // Populate category sidebar
+  categories.forEach(cat => {
+    const li = document.createElement('li');
+    li.textContent = cat;
+    li.addEventListener('click', () => displayCategory(cat));
+    categoryListEl.appendChild(li);
+  });
+
+  // To store Chart instances to destroy on toggle off
+  const chartInstances = new Map();
+
+  function displayCategory(category) {
+    categoryTitle.textContent = category;
+    productArea.innerHTML = '';
+
+    const products = comparisonData[category];
+    if (!products) return;
+
+    products.forEach(product => {
+      const prices = Object.entries(product.platforms);
+      const minPrice = Math.min(...prices.map(([_, price]) => price));
+
+      const productBlock = document.createElement('div');
+      productBlock.className = 'product-block';
+
+      // Product name and image
+      const nameEl = document.createElement('h3');
+      nameEl.textContent = product.name;
+      productBlock.appendChild(nameEl);
+
+      if(product.image){
+        const imgEl = document.createElement('img');
+        imgEl.className = 'product-img';
+        imgEl.src = product.image;
+        imgEl.alt = product.name;
+        productBlock.appendChild(imgEl);
+      }
+
+      // Create price comparison table
+      const table = document.createElement('table');
+      table.className = 'compare-table';
+
+      // Table header
+      const thead = document.createElement('thead');
+      const headerRow = document.createElement('tr');
+      const platformTh = document.createElement('th');
+      platformTh.textContent = 'Platform';
+      headerRow.appendChild(platformTh);
+      const priceTh = document.createElement('th');
+      priceTh.textContent = 'Price (₹)';
+      headerRow.appendChild(priceTh);
+      thead.appendChild(headerRow);
+      table.appendChild(thead);
+
+      // Table body
+      const tbody = document.createElement('tbody');
+      prices.forEach(([platform, price]) => {
+        const row = document.createElement('tr');
+        if(price === minPrice){
+          row.classList.add('best-price');
+        }
+        const platformTd = document.createElement('td');
+        platformTd.textContent = platform;
+        const priceTd = document.createElement('td');
+        priceTd.textContent = price;
+        row.appendChild(platformTd);
+        row.appendChild(priceTd);
+        tbody.appendChild(row);
+      });
+      table.appendChild(tbody);
+
+      productBlock.appendChild(table);
+
+      // Toggle Graph button
+      const toggleBtn = document.createElement('button');
+      toggleBtn.className = 'toggle-btn';
+      toggleBtn.textContent = 'Graph';
+      productBlock.appendChild(toggleBtn);
+
+      // Canvas for Chart.js
+      const canvas = document.createElement('canvas');
+      canvas.className = 'mini-chart';
+      productBlock.appendChild(canvas);
+
+      // Smaller canvas size
+      canvas.style.width = '300px';
+      canvas.style.height = '180px';
+
+      toggleBtn.addEventListener('click', () => {
+        if (canvas.style.display === 'none' || canvas.style.display === '') {
+          canvas.style.display = 'block';
+
+          if (chartInstances.has(canvas)) {
+            chartInstances.get(canvas).destroy();
+            chartInstances.delete(canvas);
+          }
+
+          const chartData = {
+            labels: prices.map(([platform]) => platform),
+            datasets: [{
+              label: 'Price (₹)',
+              data: prices.map(([_, price]) => price),
+              backgroundColor: prices.map(([_, price]) => price === minPrice ? '#27ae60' : '#3498db'),
+              borderWidth: 1
+            }]
+          };
+          const chartOptions = {
+            responsive: true,
+            plugins: {
+              legend: { display: false },
+              tooltip: { enabled: true }
+            },
+            scales: {
+              y: {
+                beginAtZero: true,
+                ticks: {
+                  font: {
+                    weight: 'bold',
+                    size: 16
+                  },
+                  color: '#333' // Dark color for readability
+                  }
+                },
+                x: {
+                  ticks: {
+                    font: {
+                      weight: 'bold',
+                      size: 22
+                    },
+                    color: '#333' // Dark color for readability
+                    }
+                  }
+                }
+              };
+
+          const ctx = canvas.getContext('2d');
+          const chart = new Chart(ctx, {
+            type: 'bar',
+            data: chartData,
+            options: chartOptions
+          });
+          chartInstances.set(canvas, chart);
+
+        } else {
+          canvas.style.display = 'none';
+          if (chartInstances.has(canvas)) {
+            chartInstances.get(canvas).destroy();
+            chartInstances.delete(canvas);
+          }
+        }
+      });
+
+      productArea.appendChild(productBlock);
+    });
+  }
+
+  // Chatbot functionality
+  const chatbotIcon = document.getElementById('chatbot-icon');
+  const chatbotContainer = document.getElementById('chatbot-container');
+  const chatbotBody = document.getElementById('chatbot-body');
+  const chatbotInput = chatbotContainer.querySelector('input');
+  const chatbotSendBtn = chatbotContainer.querySelector('button');
+
+  chatbotIcon.addEventListener('click', () => {
+    if(chatbotContainer.style.display === 'flex'){
+      chatbotContainer.style.display = 'none';
+    } else {
+      chatbotContainer.style.display = 'flex';
+      chatbotInput.focus();
+    }
+  });
+
+  chatbotSendBtn.addEventListener('click', sendMessage);
+  chatbotInput.addEventListener('keypress', e => {
+    if(e.key === 'Enter') sendMessage();
+  });
+
+  function sendMessage(){
+    const msg = chatbotInput.value.trim();
+    if(!msg) return;
+
+    appendChat('You', msg);
+    chatbotInput.value = '';
+
+    // Simple AI response based on keywords
+    setTimeout(() => {
+      const response = generateResponse(msg.toLowerCase());
+      appendChat('AI', response);
+    }, 800);
+  }
+
+  function appendChat(sender, message){
+    const msgEl = document.createElement('div');
+    msgEl.style.margin = '6px 0';
+    if(sender === 'You'){
+      msgEl.style.textAlign = 'right';
+      msgEl.textContent = message;
+    } else {
+      msgEl.style.textAlign = 'left';
+      msgEl.textContent = message;
+    }
+    chatbotBody.appendChild(msgEl);
+    chatbotBody.scrollTop = chatbotBody.scrollHeight;
+  }
+
+  function generateResponse(text){
+    if(text.includes('skin')){
+      return 'For your skin tone, I recommend warm colors like reds and oranges!';
+    }
+    if(text.includes('style')){
+      return 'Casual and comfy outfits are trending now. Would you like some T-shirt or Jeans recommendations?';
+    }
+    if(text.includes('price') || text.includes('cheap') || text.includes('affordable')){
+      return 'I can help find the lowest prices for you. Pick a category from the left to start!';
+    }
+    return "Sorry, I didn't get that. Try asking about fashion styles or price comparisons!";
+  }
+</script>
+
+</body>
+</html>
