@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🛒 Start Shopping with BuyMI</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #eef6fd;
+    }
+    h1 {
+      text-align: center;
+      font-size: 48px;
+      color: #2c3e50;
+      margin-top: 30px;
+    }
+    h3 {
+      text-align: center;
+      color: #2c3e50;
+    }
+    .categories, .subcategories {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin: 20px 0;
+    }
+    .categories button, .subcategories button {
+      background: linear-gradient(to right, #9b59b6, #8e44ad);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 20px;
+      font-size: 15px;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .categories button:hover, .subcategories button:hover {
+      background: linear-gradient(to right, #00c6ff, #0072ff);
+      transform: scale(1.05);
+    }
+    .comparison-section {
+      background: #fff;
+      border-radius: 15px;
+      padding: 20px;
+      margin: 20px auto;
+      max-width: 1100px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+    ul li {
+      display: flex;
+      align-items: center;
+      margin-bottom: 16px;
+      background: #f2f2f2;
+      border-radius: 12px;
+      padding: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+    ul li img {
+      width: 90px;
+      height: auto;
+      border-radius: 10px;
+      margin-right: 16px;
+    }
+    canvas {
+      margin: 40px auto;
+      display: block;
+      width: 90% !important;
+      height: 600px !important;
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>🛍️ Start Shopping with BuyMI</h1>
+
+  <div class="categories">
+    <button onclick="showSubcategories('electronics')">Electronics</button>
+    <button onclick="showSubcategories('beauty')">Beauty</button>
+    <button onclick="showSubcategories('clothes')">Clothes</button>
+    <button onclick="showSubcategories('furniture')">Furniture</button>
+    <button onclick="showSubcategories('appliances')">Appliances</button>
+    <button onclick="showSubcategories('toys')">Toys</button>
+  </div>
+
+  <div class="subcategories" id="subcategories"></div>
+  <div class="comparison-section" id="comparisonSection"></div>
+  <canvas id="priceGraph"></canvas>
+
+<script>
+const subcategoryData = {
+  electronics: ['Laptops', 'Mobiles', 'Smartwatches', 'Headphones'],
+  beauty: ['Skincare', 'Makeup'],
+  clothes: ['T-Shirts', 'Jeans', 'Hoodies', 'Dresses', 'Tops', 'Over T-Shirts'],
+  furniture: ['Beds', 'Side Tables', 'Shoe Racks', 'Chairs', 'Sofas'],
+  appliances: ['Dishwashers', 'Washing Machines', 'Refrigerators', 'Electric Fans'],
+  toys: ['Board Games', 'Remote Cars', 'Teddy Bears', 'Building Blocks']
+};
+
+const productComparisonData = {
+  'T-Shirts': [
+    { name: "Roadster Men T-Shirt", amazon: 499, flipkart: 480, snapdeal: 470, meesho: 450, img: "https://assets.myntassets.com/w_412,q_60,dpr_2,fl_progressive/assets/images/10943262/2020/9/1/0c496f57-e53d-42e8-8cc6-f2ecdcc0d1a51598949417533-Roadster-Men-Black-Printed-Round-Neck-T-shirt-53315989494159-1.jpg" },
+    { name: "Bewakoof Oversized Tee", amazon: 599, flipkart: 580, snapdeal: 570, meesho: 560, img: "https://images.bewakoof.com/original/men-s-grey-calm-down-graphic-printed-oversized-t-shirt-596121-1686321049-1.jpg" },
+    { name: "Puma Sports T-Shirt", amazon: 899, flipkart: 870, snapdeal: 860, meesho: 850, img: "https://images-static.nykaa.com/media/catalog/product/d/d/dd5e7f652655901_1.jpg?tr=w-500" }
+  ],
+  'Jeans': [
+    { name: "Levi's Men Jeans", amazon: 1799, flipkart: 1750, snapdeal: 1730, meesho: 1700, img: "https://assets.myntassets.com/h_1440,q_100,w_1080/v1/assets/images/30189327/2024/8/26/500ced33-7253-407a-9ef1-b2c8a487e0a91724651690202-Levis-Men-Jeans-7561724651689606-1.jpg" },
+    { name: "H&M Slim Fit", amazon: 1599, flipkart: 1550, snapdeal: 1530, meesho: 1500, img: "https://image.hm.com/assets/hm/4e/26/4e26e13b6a7657d0fc4a307b2b641ef393b7ed82.jpg?imwidth=2160" },
+    { name: "Spykar Regular Jeans", amazon: 1399, flipkart: 1350, snapdeal: 1330, meesho: 1300, img: "https://spykar.com/cdn/shop/products/peHY7weNzw-8905566247697_8.webp?v=1750337913" }
+  ],
+  'Hoodies': [
+    { name: "Campus Sutra Hoodie", amazon: 1299, flipkart: 1270, snapdeal: 1250, meesho: 1220, img: "https://campussutra.com/cdn/shop/products/AWIN21_HHH_M_PLN_BLGR_F.webp?v=1661863853" },
+    { name: "Zudio Solid Hoodie", amazon: 999, flipkart: 980, snapdeal: 970, meesho: 950, img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQVaRB08RVLphun0HO0RB-FlEXRE9ZkD2Sa65XKkBzoHp-JqdokiPdPLP1bqTIB6Fh3yjY&usqp=CAU" },
+    { name: "Puma Men Hoodie", amazon: 1999, flipkart: 1950, snapdeal: 1930, meesho: 1900, img: "https://assets.ajio.com/medias/sys_master/root/20231206/ZPf1/657086f1ddf7791519b4b6fd/-473Wx593H-469535644-white-MODEL.jpg" }
+  ],
+  'Dresses': [
+    { name: "Only Women Dress", amazon: 1499, flipkart: 1450, snapdeal: 1430, meesho: 1400, img: "https://assets.myntassets.com/w_412,q_60,dpr_2,fl_progressive/assets/images/2025/APRIL/22/goy2abP1_a7b978e3b9814e96bb022bd712537db2.jpg" },
+    { name: "AND Printed Dress", amazon: 1999, flipkart: 1950, snapdeal: 1930, meesho: 1900, img: "https://m.media-amazon.com/images/I/81wKoF3pczL._UY1100_.jpg" },
+    { name: "Tokyo Talkies Dress", amazon: 999, flipkart: 970, snapdeal: 950, meesho: 930, img: "https://rukminim2.flixcart.com/image/704/844/xif0q/dress/o/7/w/s-ttj6008734-tokyo-talkies-original-imagpact7yf6vzzn.jpeg?q=90&crop=false" }
+  ],
+  'Tops': [
+    { name: "Biba Cotton Top", amazon: 799, flipkart: 770, snapdeal: 750, meesho: 730, img: "https://images.biba.in/dw/image/v2/BKQK_PRD/on/demandware.static/-/Sites-biba-product-catalog/default/dwbce497bd/images/ss24/summerstpls20256ss24wht_1.jpg?sw=502&sh=753" },
+    { name: "Only Black Top", amazon: 899, flipkart: 870, snapdeal: 850, meesho: 830, img: "https://img.tatacliq.com/images/i19//437Wx649H/MP000000023242492_437Wx649H_202408090032151.jpeg" },
+    { name: "Harpa Women Top", amazon: 699, flipkart: 670, snapdeal: 650, meesho: 630, img: "https://rukminim2.flixcart.com/image/704/844/xif0q/top/i/e/i/-original-imaguaaszpvzrxpy.jpeg?q=90&crop=false" }
+  ],
+  'Over T-Shirts': [
+    { name: "Jack & Jones Oversized", amazon: 1299, flipkart: 1270, snapdeal: 1250, meesho: 1220, img: "https://www.jackjones.in/cdn/shop/files/190235202_g0.jpg?v=1745328065" },
+    { name: "Zara Loose Fit Tee", amazon: 1099, flipkart: 1070, snapdeal: 1050, meesho: 1020, img: "https://static.zara.net/assets/public/05d6/f64c/6e5c478c8a15/65ea2e03eb80/05584261250-p/05584261250-p.jpg?ts=1727277108008" },
+    { name: "Bewakoof Graphic Tee", amazon: 799, flipkart: 770, snapdeal: 750, meesho: 730, img: "https://images.bewakoof.com/t540/women-s-black-chill-girl-graphic-printed-oversized-acid-wash-t-shirt-655030-1733386382-1.jpg" }
+  ],
+  'Board Games': [
+    { name: "Monopoly", amazon: 799, flipkart: 780, snapdeal: 770, meesho: 750, img: "https://i.pinimg.com/1200x/bc/17/f7/bc17f7266a5ba0bf3a0b5435d991028f.jpg" },
+    { name: "Scrabble Original", amazon: 899, flipkart: 870, snapdeal: 850, meesho: 830, img: "https://i.pinimg.com/736x/6c/a8/76/6ca8763d8c0b92b00d6e4ed896c42e41.jpg" },
+    { name: "UNO Cards", amazon: 199, flipkart: 180, snapdeal: 170, meesho: 160, img: "https://i.pinimg.com/1200x/bc/ff/e6/bcffe66fcbe83877812ea339158f4baf.jpg" }
+  ],
+  'Remote Cars': [
+    { name: "Baybee RC Jeep", amazon: 1299, flipkart: 1270, snapdeal: 1250, meesho: 1220, img: "https://i.pinimg.com/736x/20/3b/83/203b837521f99ce824bae05753dc8525.jpg" },
+    { name: "Rastar BMW RC", amazon: 1499, flipkart: 1470, snapdeal: 1450, meesho: 1420, img: "https://i.pinimg.com/736x/58/07/4d/58074d9d1bbfd46f6639e8064cfbbe4d.jpg" },
+    { name: "Lego RC Racer", amazon: 1799, flipkart: 1750, snapdeal: 1730, meesho: 1700, img: "https://i.pinimg.com/1200x/c8/4f/9b/c84f9b7b3d033b1724b2d3279d0f5f58.jpg" }
+  ],
+  'Teddy Bears': [
+    { name: "JES Teddy Bear 3ft", amazon: 699, flipkart: 670, snapdeal: 650, meesho: 630, img: "https://m.media-amazon.com/images/I/61UXOcXtN+L._SL1200_.jpg" },
+    { name: "Hamleys Plush Bear", amazon: 999, flipkart: 970, snapdeal: 950, meesho: 930, img: "https://m.media-amazon.com/images/I/71EQsb6TDAL._SL1500_.jpg" },
+    { name: "Soft Buddies Bear", amazon: 599, flipkart: 570, snapdeal: 550, meesho: 530, img: "https://m.media-amazon.com/images/I/71AsPKzG7vL._SL1500_.jpg" }
+  ],
+  'Building Blocks': [
+    { name: "LEGO Classic Bricks", amazon: 1399, flipkart: 1370, snapdeal: 1350, meesho: 1320, img: "https://m.media-amazon.com/images/I/71YqSNNPbSL._SL1500_.jpg" },
+    { name: "Smartivity DIY Blocks", amazon: 999, flipkart: 970, snapdeal: 950, meesho: 930, img: "https://m.media-amazon.com/images/I/71v9QXs5DqL._SL1500_.jpg" },
+    { name: "Baybee Wooden Blocks", amazon: 799, flipkart: 770, snapdeal: 750, meesho: 730, img: "https://m.media-amazon.com/images/I/71qaW8LuyfL._SL1500_.jpg" }
+  ],
+  'Beds': [
+    { name: "Wakefit Queen Bed", amazon: 14999, flipkart: 14500, snapdeal: 14800, meesho: 14300, img: "https://i.pinimg.com/736x/a5/b4/c8/a5b4c81151fde67bd71e775500270667.jpg" },
+    { name: "AmazonBasics Metal Bed", amazon: 11999, flipkart: 11700, snapdeal: 11600, meesho: 11500, img: "https://i.pinimg.com/736x/eb/36/bd/eb36bd6559cdbc0c344d7f839922d3ca.jpg" },
+    { name: "Home Centre Solid Wood Bed", amazon: 17999, flipkart: 17500, snapdeal: 17300, meesho: 17000, img: "https://i.pinimg.com/736x/0a/89/66/0a8966707009b28454c3858a7be9f121.jpg" }
+  ],
+  'Side Tables': [
+    { name: "Nilkamal Side Table", amazon: 999, flipkart: 980, snapdeal: 970, meesho: 950, img: "https://i.pinimg.com/736x/14/40/6b/14406bd5a0cb36599140a2f24c0be299.jpg" },
+    { name: "Solimo Engineered Wood", amazon: 1299, flipkart: 1270, snapdeal: 1260, meesho: 1240, img: "https://i.pinimg.com/1200x/12/d2/0e/12d20efe7b6f8f2bc21ef7c0c50da914.jpg" },
+    { name: "DeckUp Table", amazon: 1499, flipkart: 1450, snapdeal: 1430, meesho: 1400, img: "https://i.pinimg.com/1200x/e8/44/d6/e844d6a831ad33a478b8027b59aa01c6.jpg" }
+  ],
+  'Shoe Racks': [
+    { name: "AmazonBasics 3-Tier", amazon: 899, flipkart: 880, snapdeal: 870, meesho: 850, img: "https://www.dealsmagnet.com/images/amazonbasics-indoor-clothes-dryer-tower-with-folda-o-15ZzokT0.jpg" },
+    { name: "Nilkamal Plastic Rack", amazon: 1499, flipkart: 1470, snapdeal: 1460, meesho: 1440, img: "https://m.media-amazon.com/images/I/61SorgFAIvL.jpg" },
+    { name: "Cello Novelty Rack", amazon: 1899, flipkart: 1850, snapdeal: 1830, meesho: 1800, img: "https://cdn.dotpe.in/longtail/store-items/6791027/A12XhOJR.jpeg" }
+  ],
+  'Chairs': [
+    { name: "Green Soul Gaming Chair", amazon: 8999, flipkart: 8799, snapdeal: 8650, meesho: 8500, img: "https://www.greensoul.online/cdn/shop/files/739531939-red_650x.png?v=1753535060" },
+    { name: "Nilkamal Plastic Chair", amazon: 799, flipkart: 780, snapdeal: 770, meesho: 750, img: "https://www.nilkamalfurniture.com/cdn/shop/files/Weekender-plastic-chair.jpg?v=1703847445&width=1080" },
+    { name: "Urban Ladder Lounge Chair", amazon: 3999, flipkart: 3899, snapdeal: 3850, meesho: 3790, img: "https://www.ulcdn.net/images/products/920997/product/Genoa_Floral_Wing_Chair_LP.jpg?1722319342" },
+  ],
+  'Sofas': [
+    { name: "Wakefit 3-Seater Sofa", amazon: 17999, flipkart: 17500, snapdeal: 17300, meesho: 17000, img: "https://ik.imagekit.io/2xkwa8s1i/img/npl_modified_images/SOFA_IMAGES/WSFASLTN3FJDB_LS_1.jpg?tr=w-3840" },
+    { name: "Solimo Fabric Sofa", amazon: 18999, flipkart: 18500, snapdeal: 18300, meesho: 18000, img: "https://m.media-amazon.com/images/I/81sOgDaH9qL._UF894,1000_QL80_.jpg" },
+    { name: "Home Centre Leatherette", amazon: 20999, flipkart: 20500, snapdeal: 20300, meesho: 20000, img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQPDDlr31Vk5JIMP60opAKyz5Lo2_wluNX32g&s" },
+  ],
+  'Dishwashers': [
+    { name: "Bosch 13 Place Dishwasher", amazon: 42999, flipkart: 41999, snapdeal: 42500, meesho: 41000, img: "https://5.imimg.com/data5/MB/VM/XD/SELLER-95876692/5710295cv11d.jpg" },
+    { name: "IFB Neptune VX", amazon: 37999, flipkart: 36999, snapdeal: 37500, meesho: 36000, img: "https://s3.ap-south-1.amazonaws.com/assetsv1.viveks.com/product/4134/tA2Ouj5M6WcGPg6XKnq1J1H7wCHuDrEICpWhrYFm.webp" },
+    { name: "Voltas Beko 8 Place", amazon: 27999, flipkart: 26999, snapdeal: 27500, meesho: 26000, img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRebhS3sjJ-RX6PbW6L0hdfFWkrFKqCkuFRyg&s" },
+  ],
+  'Washing Machines': [
+    { name: "LG 6.5kg Top Load", amazon: 16999, flipkart: 16500, snapdeal: 16300, meesho: 16000, img: "https://m.media-amazon.com/images/I/71CokBQG1uL._UF1000,1000_QL80_.jpg" },
+    { name: "Samsung 7kg Front Load", amazon: 22999, flipkart: 22500, snapdeal: 22300, meesho: 22000, img: "https://images.samsung.com/is/image/samsung/p6pim/in/ww70t502nan-tl/gallery/in-front-loading-washer-ww10t534daws1-374545-ww70t502nan-tl-383435845?$684_547_PNG$" },
+    { name: "Whirlpool 7kg Top Load", amazon: 18999, flipkart: 18500, snapdeal: 18300, meesho: 18000, img: "https://www.jiomart.com/images/product/original/493715208/whirlpool-gen-x-series-7-kg-top-load-fully-automatic-washing-machine-grey-digital-o493715208-p601554154-0-202305161819.jpeg?im=Resize=(420,420)" },
+  ],
+  'Refrigerators': [
+    { name: "Samsung 253L 3-Star", amazon: 22999, flipkart: 22500, snapdeal: 22300, meesho: 22000, img: "https://www.bajajmall.in/emistore/media/catalog/product/s/a/samsungrt28a3743bxhlluxeblack_base.jpeg" },
+    { name: "LG 260L Smart Inverter", amazon: 24999, flipkart: 24500, snapdeal: 24300, meesho: 24000, img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTnPfk52R6rfRR1DYPkerf6MGWNs2IC_FUSsA&s" },
+    { name: "Whirlpool 265L", amazon: 23999, flipkart: 23500, snapdeal: 23300, meesho: 23000, img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQNlrVfv8h2nfzaWj52OrTYdieJiGiiV4UhrA&s" },
+  ],
+  'Electric Fans': [
+    { name: "Bajaj Ceiling Fan", amazon: 1599, flipkart: 1550, snapdeal: 1530, meesho: 1500, img: "https://m.media-amazon.com/images/I/51MRxbxMWZL._UF894,1000_QL80_.jpg" },
+    { name: "Usha Mist Air Icy", amazon: 2299, flipkart: 2250, snapdeal: 2230, meesho: 2200, img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTErMBdST_w8UwR-S-I65vjRptm8rGpL3B70Q&s" },
+    { name: "Havells Table Fan", amazon: 2799, flipkart: 2750, snapdeal: 2730, meesho: 2700, img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ03Bsw3Jc7-T44lm65UgXXct8rwdLAzxzCEg&s" }
+  ],
+  'Laptops': [
+    { name: "HP Pavilion 15", amazon: 56990, flipkart: 55990, snapdeal: 57500, meesho: 56000, img: "https://m.media-amazon.com/images/I/51UJ878IQGL._UF350,350_QL80_.jpg" },
+    { name: "Dell Inspiron 15", amazon: 61990, flipkart: 60990, snapdeal: 61500, meesho: 60500, img: "https://www.simplyshopping.in/cdn/shop/products/2_7824ab4f-d1a9-4dff-ac1d-1a9dea78e8d8_1200x1200.png?v=1663867707" },
+    { name: "Lenovo IdeaPad Slim 3", amazon: 52990, flipkart: 51990, snapdeal: 53000, meesho: 51000, img: "https://www.gizmochina.com/wp-content/uploads/2020/09/a-3-500x500.jpg?x70461" }
+  ],
+  'Mobiles': [
+    { name: "iPhone 14", amazon: 79999, flipkart: 78999, snapdeal: 79500, meesho: 78500, img: "https://m.media-amazon.com/images/I/61cwywLZR-L._SL1500_.jpg" },
+    { name: "Samsung Galaxy S23", amazon: 69999, flipkart: 70999, snapdeal: 69500, meesho: 68999, img: "https://m.media-amazon.com/images/I/71goZuIha-L._UF1000,1000_QL80_.jpg" },
+    { name: "OnePlus 11R", amazon: 39999, flipkart: 39500, snapdeal: 39000, meesho: 38500, img: "https://m.media-amazon.com/images/I/613SAOPmLeL.jpg" },
+  ],
+  'Smartwatches': [
+    { name: "Noise ColorFit Icon 2", amazon: 1999, flipkart: 2099, snapdeal: 2050, meesho: 1980, img: "https://images.snapmint.com/product_assets/images/000/926/340/large/data?1706611808" },
+    { name: "boAt Wave Lite", amazon: 1499, flipkart: 1550, snapdeal: 1600, meesho: 1480, img: "https://m.media-amazon.com/images/I/617eiZeFtNL._SL1500_.jpg" },
+    { name: "Realme Smartwatch 2", amazon: 2399, flipkart: 2499, snapdeal: 2450, meesho: 2350, img: "https://oxygendigitalshop.com/media/cache/2500x0/catalog/product/2/_/2_32_2_1660109499.webp" },
+  ],
+  'Headphones': [
+    { name: "boAt Rockerz 450", amazon: 1499, flipkart: 1550, snapdeal: 1520, meesho: 1500, img: "https://m.media-amazon.com/images/I/61u1VALn6JL._SL1500_.jpg" },
+    { name: "JBL Tune 510BT", amazon: 2499, flipkart: 2599, snapdeal: 2450, meesho: 2400, img: "https://in.jbl.com/dw/image/v2/BFND_PRD/on/demandware.static/-/Sites-masterCatalog_Harman/default/dw8c1220b5/JBL_TUNE_510BT_Product%20Image_Hero_Blue.png?sw=535&sh=535" },
+    { name: "Sony WH-CH520", amazon: 3299, flipkart: 3400, snapdeal: 3350, meesho: 3200, img: "https://m.media-amazon.com/images/I/61C66qTqnwL._UF1000,1000_QL80_.jpg" },
+  ],
+  'Skincare': [
+    { name: "Cetaphil Gentle Cleanser", amazon: 345, flipkart: 355, snapdeal: 350, meesho: 340, img: "https://cdn11.bigcommerce.com/s-ilgxsy4t82/images/stencil/1280x1280/products/1340/2218/61tPogUp6kL_32d837e3-b3cb-442a-8527-b789ca8c5ee3__69402.1656618522.jpg?c=1&imbypass=on" },
+    { name: "Neutrogena Face Wash", amazon: 299, flipkart: 305, snapdeal: 310, meesho: 290, img: "https://images.ctfassets.net/aub2fvcyp2t8/6VC8vvmJIlvWJ0hxWdxDOj/c65c7d4cec0e00e11659a0940f11cfe5/oil_free_acne_wash_175ml-min-en-in" },
+    { name: "Nivea Moisturizer Cream", amazon: 199, flipkart: 209, snapdeal: 200, meesho: 190, img: "https://m.media-amazon.com/images/I/61UP6RvA9wL.jpg" },
+  ],
+  'Makeup': [
+    { name: "Lakme Foundation", amazon: 425, flipkart: 430, snapdeal: 440, meesho: 420, img: "https://www.lakmeindia.com/cdn/shop/files/29685_H-8901030971082.jpg?v=1695816973" },
+    { name: "Maybelline Mascara", amazon: 349, flipkart: 355, snapdeal: 360, meesho: 345, img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTnWkR6pZAaNxRcxbDKJAA9LwY1m9s0f6TsslPIBcvzhpxMlS0Fz57nA7beYzPwlx0Do5k&usqp=CAU" },
+    { name: "Nykaa Lipstick", amazon: 299, flipkart: 289, snapdeal: 295, meesho: 280, img: "https://www.silkrute.com/images/detailed/3203/51JoTYzUWUL.jpg" },
+  ]
+};
+
+function showSubcategories(category) {
+  const subcats = subcategoryData[category];
+  const container = document.getElementById('subcategories');
+  container.innerHTML = '';
+  subcats.forEach(sub => {
+    const btn = document.createElement('button');
+    btn.innerText = sub;
+    btn.onclick = () => showProductComparison(sub);
+    container.appendChild(btn);
+  });
+  document.getElementById('comparisonSection').innerHTML = '';
+  document.getElementById('priceGraph').style.display = 'none';
+}
+
+function showProductComparison(subcategory) {
+  const data = productComparisonData[subcategory];
+  if (!data) {
+    document.getElementById('comparisonSection').innerHTML = `<p>No data available for ${subcategory}</p>`;
+    return;
+  }
+  let html = `<h3>${subcategory} Price Comparison</h3><ul>`;
+  let labels = [], amazon = [], flipkart = [], snapdeal = [], meesho = [];
+  data.forEach(item => {
+    html += `
+      <li>
+        <img src="${item.img}" alt="${item.name}" />
+        <div>
+          <strong>${item.name}</strong><br>
+          Amazon: ₹${item.amazon}, Flipkart: ₹${item.flipkart}, Snapdeal: ₹${item.snapdeal}, Meesho: ₹${item.meesho}
+        </div>
+      </li>`;
+    labels.push(item.name);
+    amazon.push(item.amazon);
+    flipkart.push(item.flipkart);
+    snapdeal.push(item.snapdeal);
+    meesho.push(item.meesho);
+  });
+  html += `</ul>`;
+  document.getElementById('comparisonSection').innerHTML = html;
+  drawGraph(labels, amazon, flipkart, snapdeal, meesho);
+}
+
+function drawGraph(labels, amazon, flipkart, snapdeal, meesho) {
+  document.getElementById('priceGraph').style.display = 'block';
+  const ctx = document.getElementById('priceGraph').getContext('2d');
+  if (window.myChart) window.myChart.destroy();
+  window.myChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [
+        { label: 'Amazon', data: amazon, backgroundColor: 'rgba(255, 99, 132, 0.7)' },
+        { label: 'Flipkart', data: flipkart, backgroundColor: 'rgba(54, 162, 235, 0.7)' },
+        { label: 'Snapdeal', data: snapdeal, backgroundColor: 'rgba(255, 206, 86, 0.7)' },
+        { label: 'Meesho', data: meesho, backgroundColor: 'rgba(153, 102, 255, 0.7)' }
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        title: {
+          display: true,
+          text: 'Price Comparison Chart'
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: false
+        }
+      }
+    }
+  });
+}
+</script>
+</body>
+</html> 

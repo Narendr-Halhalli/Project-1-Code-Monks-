@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🧞 Welcome to Your Magical StyleGenie</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Pacifico&family=Quicksand:wght@400;600&display=swap');
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Quicksand', sans-serif;
+      background: linear-gradient(135deg, #ffb6f1, #c9c6ff);
+      background-size: 400% 400%;
+      animation: gradientBG 12s ease infinite;
+      color: #333;
+    }
+
+    @keyframes gradientBG {
+      0% {background-position: 0% 50%;}
+      50% {background-position: 100% 50%;}
+      100% {background-position: 0% 50%;}
+    }
+
+    h1 {
+      font-family: 'Pacifico', cursive;
+      font-size: 48px;
+      text-align: center;
+      margin-top: 60px;
+      color: white;
+      text-shadow: 2px 2px 8px #a66cff;
+      animation: pop 1s ease-in-out;
+    }
+
+    @keyframes pop {
+      from { transform: scale(0.8); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .intro {
+      max-width: 800px;
+      margin: 30px auto;
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 20px;
+      padding: 20px;
+      text-align: center;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 0 30px rgba(0,0,0,0.15);
+      font-size: 20px;
+    }
+
+    .buttons {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      margin-top: 40px;
+    }
+
+    .buttons a {
+      text-decoration: none;
+      padding: 15px 30px;
+      font-size: 18px;
+      border-radius: 30px;
+      background: linear-gradient(to right, #ff66c4, #a66cff);
+      color: white;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .buttons a:hover {
+      transform: scale(1.1);
+      background: linear-gradient(to right, #fc5c7d, #6a82fb);
+    }
+
+    .ai-assistant {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #a66cff;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 20px rgba(166,108,255,0.7);
+      cursor: pointer;
+      animation: floaty 3s ease-in-out infinite;
+      z-index: 1001;
+    }
+
+    .ai-assistant img {
+      width: 34px;
+    }
+
+    @keyframes floaty {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .chat-box {
+      display: none;
+      position: fixed;
+      bottom: 90px;
+      right: 20px;
+      width: 350px;
+      height: 460px;
+      background: url('https://i.pinimg.com/originals/ee/04/fd/ee04fd92737d2163bfb2bca4e730b6d2.gif') center/cover no-repeat;
+      border-radius: 20px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+      padding: 16px;
+      font-size: 14px;
+      color: #fff;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      backdrop-filter: blur(2px);
+      border: 2px solid #fff;
+    }
+
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding-right: 6px;
+    }
+
+    .chat-messages p {
+      background: rgba(0, 0, 0, 0.5);
+      padding: 10px;
+      margin-bottom: 8px;
+      border-radius: 10px;
+    }
+
+    .chat-input {
+      display: flex;
+      margin-top: 10px;
+    }
+
+    .chat-input input {
+      flex: 1;
+      padding: 10px;
+      border-radius: 10px 0 0 10px;
+      border: none;
+      outline: none;
+      background: rgba(255, 255, 255, 0.8);
+      color: #333;
+    }
+
+    .chat-input button {
+      padding: 10px 16px;
+      background-color: #ff4dc4;
+      color: white;
+      border: none;
+      border-radius: 0 10px 10px 0;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>🧞 Welcome to Your Magical StyleGenie</h1>
+
+  <div class="intro">
+    ✨ Unlock your style destiny with your magical AI companion.<br>
+    Discover personalized outfits, explore fashion moods, and try-on clothes virtually — all with a tap of style magic!
+  </div>
+
+  <div class="buttons">
+    <a href="quiz.html">🎨 Take My Style Quiz</a>
+    <a href="style-profile.html">👥 View Your Style Profile</a>
+  </div>
+
+  <div class="ai-assistant" onclick="toggleChat()">
+    <img src="https://cdn-icons-png.flaticon.com/512/4712/4712027.png" alt="AI Assistant">
+  </div>
+
+  <div class="chat-box" id="chatBox">
+    <div class="chat-messages" id="chatMessages">
+      <p><strong>StyleGenie:</strong> Hi there! I'm here to guide your fashion journey ✨</p>
+    </div>
+    <div class="chat-input">
+      <input type="text" id="userInput" placeholder="Type a message..." />
+      <button onclick="sendMessage()">Send</button>
+    </div>
+  </div>
+
+  <script>
+    function toggleChat() {
+      const box = document.getElementById("chatBox");
+      box.style.display = box.style.display === "flex" ? "none" : "flex";
+    }
+
+    function sendMessage() {
+      const input = document.getElementById("userInput");
+      const msg = input.value.trim();
+      if (!msg) return;
+
+      const chat = document.getElementById("chatMessages");
+      const userMsg = document.createElement("p");
+      userMsg.innerHTML = `<strong>You:</strong> ${msg}`;
+      chat.appendChild(userMsg);
+
+      const botMsg = document.createElement("p");
+      const lowerMsg = msg.toLowerCase();
+      let reply = "✨ I'm still learning. Try asking me about fashion or shopping!";
+
+      if (lowerMsg.includes("hello") || lowerMsg.includes("hi")) {
+        reply = "👋 Hello! Ready to style your day?";
+      } else if (lowerMsg.includes("recommend") || lowerMsg.includes("suggest")) {
+        reply = "🧞‍♀️ I recommend checking our quiz for personalized outfits!";
+      } else if (lowerMsg.includes("bye")) {
+        reply = "👋 Goodbye! Come back for more fashion magic!";
+      } else if (lowerMsg.includes("thank")) {
+        reply = "😊 You're welcome! Always here to help.";
+      } else if (lowerMsg.includes("style") || lowerMsg.includes("outfit")) {
+        reply = "🎽 Want to discover your outfit mood? Try the quiz!";
+      }
+
+      setTimeout(() => {
+        botMsg.innerHTML = `<strong>StyleGenie:</strong> ${reply}`;
+        chat.appendChild(botMsg);
+        chat.scrollTop = chat.scrollHeight;
+      }, 600);
+
+      input.value = "";
+      chat.scrollTop = chat.scrollHeight;
+    }
+  </script>
+</body>
+</html>

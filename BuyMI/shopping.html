@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🛍️ Start Shopping with BuyMI</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #eef6fd;
+    }
+    h1 {
+      text-align: center;
+      font-size: 48px;
+      color: #2c3e50;
+      margin-top: 30px;
+    }
+    h3 {
+      text-align: center;
+      color: #2c3e50;
+    }
+    .categories, .subcategories {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin: 20px 0;
+    }
+    .categories button, .subcategories button {
+      background: linear-gradient(to right, #9b59b6, #8e44ad);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 20px;
+      font-size: 15px;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .categories button:hover, .subcategories button:hover {
+      background: linear-gradient(to right, #00c6ff, #0072ff);
+      transform: scale(1.05);
+    }
+    .comparison-section {
+      background: #fff;
+      border-radius: 15px;
+      padding: 20px;
+      margin: 20px auto;
+      max-width: 1100px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+    ul li {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      background: #f2f2f2;
+      border-radius: 12px;
+      padding: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+    ul li img {
+      width: 90px;
+      height: auto;
+      border-radius: 10px;
+      margin-right: 16px;
+    }
+    .product-info {
+      flex: 1;
+    }
+    .wishlist-btn {
+      background: #ff69b4;
+      color: white;
+      border: none;
+      border-radius: 20px;
+      padding: 8px 16px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .wishlist-btn:hover {
+      background: #ff1493;
+    }
+    canvas {
+      margin: 40px auto;
+      display: block;
+      width: 90% !important;
+      height: 600px !important;
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>🛍️ Start Shopping with BuyMI</h1>
+
+  <div class="categories">
+    <button onclick="showSubcategories('electronics')">Electronics</button>
+    <button onclick="showSubcategories('beauty')">Beauty</button>
+    <button onclick="showSubcategories('clothes')">Clothes</button>
+    <button onclick="showSubcategories('furniture')">Furniture</button>
+    <button onclick="showSubcategories('appliances')">Appliances</button>
+    <button onclick="showSubcategories('toys')">Toys</button>
+  </div>
+
+  <div class="subcategories" id="subcategories"></div>
+  <div class="comparison-section" id="comparisonSection"></div>
+  <canvas id="priceGraph"></canvas>
+
+<script>
+const subcategoryData = {
+  electronics: ['Laptops', 'Mobiles', 'Smartwatches', 'Headphones'],
+  beauty: ['Skincare', 'Makeup'],
+  clothes: ['T-Shirts', 'Jeans', 'Hoodies', 'Dresses', 'Tops', 'Over T-Shirts'],
+  furniture: ['Beds', 'Side Tables', 'Shoe Racks', 'Chairs', 'Sofas'],
+  appliances: ['Dishwashers', 'Washing Machines', 'Refrigerators', 'Electric Fans'],
+  toys: ['Board Games', 'Remote Cars', 'Teddy Bears', 'Building Blocks']
+};
+
+function showSubcategories(category) {
+  const subcats = subcategoryData[category];
+  const container = document.getElementById('subcategories');
+  container.innerHTML = '';
+  subcats.forEach(sub => {
+    const btn = document.createElement('button');
+    btn.innerText = sub;
+    btn.onclick = () => showProductComparison(sub);
+    container.appendChild(btn);
+  });
+  document.getElementById('comparisonSection').innerHTML = '';
+  document.getElementById('priceGraph').style.display = 'none';
+}
+
+function showProductComparison(subcategory) {
+  const data = productComparisonData[subcategory];
+  if (!data) {
+    document.getElementById('comparisonSection').innerHTML = `<p>No data available for ${subcategory}</p>`;
+    return;
+  }
+  let html = `<h3>${subcategory} Price Comparison</h3><ul>`;
+  let labels = [], amazon = [], flipkart = [], snapdeal = [], meesho = [];
+  data.forEach(item => {
+    html += `
+      <li>
+        <img src="${item.img}" alt="${item.name}" />
+        <div class="product-info">
+          <strong>${item.name}</strong><br>
+          Amazon: ₹${item.amazon}, Flipkart: ₹${item.flipkart}, Snapdeal: ₹${item.snapdeal}, Meesho: ₹${item.meesho}
+        </div>
+        <button class="wishlist-btn" onclick='addToWishlist(${JSON.stringify(item)})'>❤️ Wishlist</button>
+      </li>`;
+    labels.push(item.name);
+    amazon.push(item.amazon);
+    flipkart.push(item.flipkart);
+    snapdeal.push(item.snapdeal);
+    meesho.push(item.meesho);
+  });
+  html += `</ul>`;
+  document.getElementById('comparisonSection').innerHTML = html;
+  drawGraph(labels, amazon, flipkart, snapdeal, meesho);
+}
+
+function drawGraph(labels, amazon, flipkart, snapdeal, meesho) {
+  document.getElementById('priceGraph').style.display = 'block';
+  const ctx = document.getElementById('priceGraph').getContext('2d');
+  if (window.myChart) window.myChart.destroy();
+  window.myChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [
+        { label: 'Amazon', data: amazon, backgroundColor: 'rgba(255, 99, 132, 0.7)' },
+        { label: 'Flipkart', data: flipkart, backgroundColor: 'rgba(54, 162, 235, 0.7)' },
+        { label: 'Snapdeal', data: snapdeal, backgroundColor: 'rgba(255, 206, 86, 0.7)' },
+        { label: 'Meesho', data: meesho, backgroundColor: 'rgba(153, 102, 255, 0.7)' }
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        title: {
+          display: true,
+          text: 'Price Comparison Chart'
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: false
+        }
+      }
+    }
+  });
+}
+
+function addToWishlist(item) {
+  let wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
+  wishlist.push(item);
+  localStorage.setItem('wishlist', JSON.stringify(wishlist));
+  alert(`${item.name} added to your wishlist!`);
+}
+</script>
+</body>
+</html>
