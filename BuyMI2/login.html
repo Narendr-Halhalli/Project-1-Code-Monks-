@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Login - BuyMI</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #a1d1d1, #4d2179 80%);
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .login-box {
+      background: #6981c9;
+      padding: 40px 50px;
+      border-radius: 15px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+      width: 100%;
+      max-width: 420px;
+      text-align: center;
+    }
+
+    h2 {
+      color: #fff;
+      margin-bottom: 20px;
+      font-size: 26px;
+      text-shadow: 0 2px 8px #4d2179;
+    }
+
+    label {
+      display: block;
+      text-align: left;
+      margin-top: 15px;
+      font-weight: 600;
+      color: #f7f1f1;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-top: 6px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 15px;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 25px;
+      background-color: #fff;
+      color: #FFBC4C;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s ease, color 0.3s ease;
+      box-shadow: 0 2px 8px #ffbc4c55;
+    }
+
+    button:hover {
+      background-color: #FFBC4C;
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+
+  <img src="images/logo.jpg" alt="BuyMi Logo" style="position:absolute;top:18px;left:18px;width:54px;height:54px;object-fit:strech;z-index:20;box-shadow:0 2px 8px #ffbc4c;background:#FFBC4C;border-radius:12px;" />
+  <div class="login-box">
+    <h2>Login to BuyMI</h2>
+    <form id="login-form">
+      <label for="username">Username:</label>
+      <input type="text" id="username" required autocomplete="username" />
+
+      <label for="password">Password:</label>
+      <input type="password" id="password" required autocomplete="current-password" />
+
+      <button type="submit">Login</button>
+    </form>
+    <div style="margin-top:18px;font-size:15px;">
+      Don't have an account?
+      <a href="#" id="signup-link" style="color:#fff;text-decoration:underline;font-weight:bold;">Sign up</a>
+    </div>
+  </div>
+
+  <script>
+  const form = document.getElementById('login-form');
+  const signupLink = document.getElementById('signup-link');
+
+  // Simple demo: store users in localStorage as an array of {username, password}
+  function getUsers() {
+    return JSON.parse(localStorage.getItem('buymi_users') || '[]');
+  }
+  function setUsers(users) {
+    localStorage.setItem('buymi_users', JSON.stringify(users));
+  }
+
+  form.onsubmit = function(e) {
+    e.preventDefault();
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value;
+    const users = getUsers();
+    const user = users.find(u => u.username === username && u.password === password);
+    if (user) {
+      localStorage.setItem('buymi_user', JSON.stringify({ username }));
+      alert(`Welcome, ${username}!`);
+      window.location.href = 'welcome.html';
+    } else {
+      alert('Invalid username or password.');
+    }
+  };
+
+  signupLink.onclick = function(e) {
+    e.preventDefault();
+    // Show a simple signup prompt
+    const username = prompt('Choose a username:');
+    if (!username) return;
+    const password = prompt('Choose a password:');
+    if (!password) return;
+    let users = getUsers();
+    if (users.find(u => u.username === username)) {
+      alert('Username already exists.');
+      return;
+    }
+    users.push({ username, password });
+    setUsers(users);
+    alert('Signup successful! You can now log in.');
+  };
+</script>
+
+</body>
+</html>

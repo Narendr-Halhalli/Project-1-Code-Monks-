@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Wishlist</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; text-align: center; margin-top: 50px; }
+    </style>
+</head>
+<body>
+    <h1>❤️ Your Wishlist</h1>
+    <div id="wishlist-items">
+        <p>Items you've added to your wishlist will appear here.</p>
+    </div>
+    <p><a href="products.html">Continue Shopping</a></p>
+    <script>
+        const wishlistItems = JSON.parse(localStorage.getItem('wishlist')) || [];
+        const wishlistDiv = document.getElementById('wishlist-items');
+        if (wishlistItems.length === 0) {
+            wishlistDiv.innerHTML = '<p>Your wishlist is empty.</p>';
+        } else {
+            let html = '<ul style="list-style:none;padding:0;">';
+            wishlistItems.forEach((item, idx) => {
+                html += `<li style="margin-bottom:15px;">`;
+                html += `<strong>${item.name}</strong><br>`;
+                if(item.image) html += `<img src="${item.image}" alt="${item.name}" style="max-width:100px;"><br>`;
+                if(item.price) html += `Price: ₹${item.price}<br>`;
+                html += `<button onclick="moveToCart(${idx})" style='margin-top:8px;margin-right:8px;background:#28a745;color:white;border:none;padding:6px 14px;border-radius:5px;cursor:pointer;'>Move to Cart</button>`;
+                html += `<button onclick="removeFromWishlist(${idx})" style='margin-top:8px;background:#e74c3c;color:white;border:none;padding:6px 14px;border-radius:5px;cursor:pointer;'>Remove</button>`;
+                html += `</li>`;
+            });
+            html += '</ul>';
+            wishlistDiv.innerHTML = html;
+        }
+
+        function removeFromWishlist(index) {
+            let wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
+            wishlist.splice(index, 1);
+            localStorage.setItem('wishlist', JSON.stringify(wishlist));
+            location.reload();
+        }
+
+        function moveToCart(index) {
+            let wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
+            let cart = JSON.parse(localStorage.getItem('cart')) || [];
+            const item = wishlist.splice(index, 1)[0];
+            cart.push(item);
+            localStorage.setItem('wishlist', JSON.stringify(wishlist));
+            localStorage.setItem('cart', JSON.stringify(cart));
+            location.reload();
+        }
+    </script>
+</body>
+</html>
